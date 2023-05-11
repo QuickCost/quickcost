@@ -17,8 +17,8 @@ class Component(Enum):
 class Material(Enum):
     Aluminium = 1
     Brass = 2
-    Carbon-Steel = 3
-    Cast-Iron = 4
+    Carbon_Steel = 3
+    Cast_Iron = 4
     Cobalt = 5
     Copper = 6
     Gold = 7
@@ -32,7 +32,7 @@ class Material(Enum):
     Zamak = 15
 
 class Part:
-    def __init__(self, name, component, volume, material, production_cost):
+    def __init__(self, name: str, component: Component, volume: float, material: Material, production_cost: float):
         self.name = name
         self.component = component
         self.volume = volume
@@ -54,9 +54,6 @@ class Part:
     def get_production_cost(self):
         return self.production_cost
 
-    def get_is_reusable(self):
-        return self.is_reusable
-
     def set_name(self, name):
         self.name = name
 
@@ -72,16 +69,14 @@ class Part:
     def set_production_cost(self, production_cost):
         self.production_cost = production_cost
 
-    def set_is_reusable(self, is_reusable):
-        self.is_reusable = is_reusable
-
     def __str__(self):
-        return self.name + ' ' + str(self.volume) + ' ' + self.material + ' ' + str(self.material_cost) + ' ' + str(self.production_cost) + ' ' + str(self.is_reusable)
+        return f'Name: {self.name}, Component: {self.component}, Volume: {self.volume}, Material: {self.material}, Production Cost: {self.production_cost}'
 
 
 """Variables globales"""
 material_prices = {}
-parts = []
+parts_vector = []
+parts_map = {}
 
 """Funciones"""
 """
@@ -111,32 +106,37 @@ def estimated_part_cost(p: Part) -> float:
     return p.get_volume() * material_prices[p.get_material()] * 2
 
 
-material_name = str(input('Introduzca el nombre del material: '))
-material_cost = int(input('Introduzca el precio por tonelada del material: '))
-
-select_part = str(input('Introduzca el nombre de la pieza: '))
-part_volume = int(input('Introduzca el volumen: '))
-part_material = str(input('Introduzca el material: '))
-
-production_cost = int(input('Introduzca el volumen: '))
-is_reusable = bool(input('Es reusable?: '))
-part_cost
-
-number_of_units
-number_of_parts
-currency
-
 def total_cost() -> float:
     """Calcula el coste total de la pieza"""
 
     total_cost = 0
 
-    for part in parts:
+    for part in parts_vector:
         total_cost += estimated_part_cost(part)
 
     return total_cost
 
 
 
+"""Programa principal"""
+material_name = str(input('Introduzca el nombre del material: '))
+material_cost = int(input('Introduzca el precio por tonelada del material: '))
 
-part1 = Part('part1', 10, 'aluminium', 100, True)
+select_part = str(input('Introduzca el nombre de la pieza: '))
+component_type = str(input('Introduzca el tipo de componente: '))
+part_volume = int(input('Introduzca el volumen: '))
+part_material = str(input('Introduzca el material: '))
+
+production_cost = int(input('Introduzca el volumen: '))
+"""is_reusable = bool(input('Es reusable?: '))"""
+part1 = Part(select_part, component_type, part_volume, part_material, production_cost)
+"""parts_vector.append(Part(select_part, component_type, part_volume, part_material, production_cost))"""
+"""parts_map[select_part] = (Part(select_part, component_type, part_volume, part_material, production_cost))"""
+part_cost = part_cost(part1)
+print(part_cost)
+
+number_of_units = int(input('Introduzca el numero de unidades: '))
+number_of_parts = int(input('Introduzca el numero de partes: '))
+currency = Currency(input('Introduzca la moneda: '))
+total_cost = total_cost()
+print(total_cost)
