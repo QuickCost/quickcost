@@ -169,7 +169,7 @@ def get_material_type(part_material: str) -> Material:
     elif part_material == "Zamak":
         return Material.Zamak
 
-def part_cost(p: Part) -> float:
+def total_cost_part(p: Part) -> float:
     # Calculate the cost of the part
     comp = p.get_component()
     if comp == Component.Chiller or comp == Component.Riser or comp == Component.Overflow:
@@ -181,16 +181,16 @@ def part_cost(p: Part) -> float:
     else:
         return -1
 
-def estimated_part_cost(p: Part) -> float:
+def estimated_cost_part(p: Part) -> float:
     # Calculate the estimated cost of the part
     return float(p.get_volume() * material_prices[p.get_material()] * 2)
 
-def total_cost() -> float:
+def total_cost_model() -> float:
     # Calculate the total cost of the model
     total_cost = 0
 
     for part in parts_vector:
-        total_cost += part_cost(part)
+        total_cost += total_cost_part(part)
 
     return total_cost
 
@@ -219,10 +219,11 @@ for index in range(number_parts):
     parts_vector.append(part)
     parts_map[part_name] = (part)
 
-    part_cost = part_cost(part)
+    part_cost = total_cost_part(part)
+
     print('The cost of the part', part.get_name(), 'is:', part_cost, currency)
     print('-' * 50)
 
-total_cost = total_cost()
+total_cost = total_cost_model()
 print('The total cost of the model', model_name, 'is:', total_cost, currency)
 print('-' * 100)
