@@ -10,7 +10,7 @@ Projecte Aplicat d'Enginyeria - PAE
 | Name | Email | GitHub username |
 | --- | --- | --- |
 | Àlex Guijarro Estarlich | alex.guijarro@estudiantat.upc.edu | Guija7 |
-| Hector Castaños Val | hector.castanos@estudiantat.upc.edu | hcast04 |
+| Hector Castaños Sánchez | hector.castanos@estudiantat.upc.edu | hcast04 |
 | Iker Blanch Quinteiro | iker.blanch@estudiantat.upc.edu | ikerbq |
 | Laura Sales Martínez | laura.sales.i@estudiantat.upc.edu | laurasales |
 
