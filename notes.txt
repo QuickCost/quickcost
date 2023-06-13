@@ -1,0 +1,10 @@
+
+  commodities-api.com/symbols
+
+ALU   Aluminium
+LCO   Cobalt
+XCU   Copper
+XAU   Gold
+NI    Nickel
+XAG   Silver
+TIN   Tin
