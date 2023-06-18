@@ -104,35 +104,35 @@ def update_material_prices():
         # Interaction with the API
         ## TODO: set material prices from API
         if m == Material.Aluminium:
-            material_prices[m] = 0.070675625
+            material_prices[m] = 2.493009304
         elif m == Material.Brass:
-            material_prices[m] = 1
+            material_prices[m] = 4.112723501
         elif m == Material.Carbon_Steel:
-            material_prices[m] = 1
+            material_prices[m] = 2.275
         elif m == Material.Cast_Iron:
-            material_prices[m] = 1
+            material_prices[m] = 0.1745926
         elif m == Material.Cobalt:
-            material_prices[m] = 16.25
+            material_prices[m] = 26.86775
         elif m == Material.Copper:
-            material_prices[m] = 0.2428125
+            material_prices[m] = 7.7849135
         if m == Material.Gold:
-            material_prices[m] = 1958.2
+            material_prices[m] = 274604.7422
         elif m == Material.Magnesium:
-            material_prices[m] = 1
+            material_prices[m] = 2.752880922
         elif m == Material.Nickel:
-            material_prices[m] = 21088.5
+            material_prices[m] = 21.056035
         elif m == Material.Silver:
-            material_prices[m] = 23.81905202
+            material_prices[m] = 775.8402098
         elif m == Material.Stainless:
-            material_prices[m] = 1
+            material_prices[m] = 4.0768
         elif m == Material.Steel:
-            material_prices[m] = 1
+            material_prices[m] = 1.6920995
         elif m == Material.Tin:
-            material_prices[m] = 25643.875
+            material_prices[m] = 25.75391
         elif m == Material.Titanium:
-            material_prices[m] = 1
+            material_prices[m] = 6.1425
         elif m == Material.Zamak:
-            material_prices[m] = 1
+            material_prices[m] = 3.21996157
 
 def get_component_type(part_component: str) -> Component:
     if part_component == "Core":
