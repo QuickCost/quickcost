@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Extension">
+<entry name="name" value="Casting"/>
+<entry name="script" value ="startup.py"/>
+<entry name="author" value="......"/>
+<entry name="publisher" value="......"/>
+<entry name="description" value="Inspire Cast Extension ..."/>
+<entry name="documentation" value="readme.html"/>
+<entry name="minProductVersion"   value="2022.2 "/>
+</section>
