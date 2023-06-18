@@ -1,6 +1,6 @@
 from hwx import gui, inspire
 from enum import Enum
-
+import requests
 
 # Global Variables
 model = inspire.getModel()
@@ -25,6 +25,7 @@ class Component(Enum):
     Sleeve = 4
     Overflow = 5
     Filter = 6
+    CastPart = 7
 
 class Material(Enum):
     Aluminium = 1
@@ -146,6 +147,8 @@ def get_component_type(part_component: str) -> Component:
         return Component.Overflow
     elif part_component == "Filter":
         return Component.Filter
+    elif part_component == "CastPart":
+        return Component.CastPart
 
 def get_material_type(part_material: str) -> Material:
     if part_material == "Aluminium":
@@ -189,7 +192,7 @@ def get_name_parts():
 def total_cost_part(p: Part) -> float:
     # Calculate the cost of the part
     comp = p.get_component()
-    if comp == Component.Chiller or comp == Component.Riser or comp == Component.Overflow:
+    if comp == Component.CastPart or comp == Component.Chiller or comp == Component.Riser or comp == Component.Overflow:
         return float(p.get_volume() * material_prices[p.get_material()])
 
     elif comp == Component.Core or comp == Component.Sleeve or comp == Component.Filter:
@@ -197,6 +200,14 @@ def total_cost_part(p: Part) -> float:
 
     else:
         return -1
+
+
+def get_component():
+    if partName.value[:5] == "riser": return "Riser"
+    elif partName.value[:6] == "sleeve": return "Sleeve"
+    elif partName.value[:4] == "Part": return "CastPart"
+    else: return "-1"
+
 
 def estimated_cost_part(p: Part) -> float:
     # Calculate the estimated cost of the part
@@ -210,6 +221,25 @@ def total_cost_model() -> float:
         total_cost += total_cost_part(part)
 
     return total_cost
+
+# def update_prices(moneda):
+#     url = f"https://commodities-api.com/api/latest?access_key=ad3lcz6of4m5b37ka20q0k5tulwdi0hanmc05wxb17mi28ygjf02ea2vpl3k&base={moneda}&symbols=ALU,LCO,XCU,XAU,NI,XAG,TIN"
+#
+#     try:
+#         # Send GET request to the API
+#         response = requests.get(url)
+#
+#         # Check if the request was successful (status code 200)
+#         if response.status_code == 200:
+#             data = response.json()
+#             # Process the response data
+#             # ...
+#             print("API request successful")
+#         else:
+#             print(f"Request failed with status code: {response.status_code}")
+#     except requests.RequestException as e:
+#         print("Error occurred during API request:", str(e))
+
 
 
 # GUI
@@ -232,10 +262,15 @@ partNameLabel = gui.Label(
     text = 'Select part',
 )
 
+def onSelected(event):
+    partComponent.text = get_component()
+    partVolume.text = get_volume()
+
 partName = gui.ComboBox(
     parent = None,
     name = 'partName',
     values = get_name_parts(),
+    command=onSelected,
 )
 
 partComponentLabel = gui.Label(
@@ -244,11 +279,10 @@ partComponentLabel = gui.Label(
     text = 'Component',
 )
 
-## TODO: set selected value with the component of the part
-partComponent = gui.ComboBox(
+partComponent = gui.Label(
     parent = None,
     name = 'partComponent',
-    values = ('Core', 'Chiller', 'Riser', 'Sleeve', 'Overflow', 'Filter', )
+    text = get_component(),
 )
 
 partVolumeLabel = gui.Label(
@@ -257,11 +291,20 @@ partVolumeLabel = gui.Label(
     text = 'Volume',
 )
 
+def get_volume():
+    volume = -1
+    for part in model_parts:
+        if part.name == partName.value:
+            volume = part.volume
+    return round(volume,4)
+
+
 ## TODO: set text with the volume of the part
 partVolume = gui.LineEdit(
     parent = None,
     name = 'partVolume',
-    text = '0',
+    text = get_volume(),
+
 )
 
 partMaterialLabel = gui.Label(
@@ -414,7 +457,7 @@ def init_data():
         part_name = partName.value
         part_component = partComponent.value
         component_type = get_component_type(part_component)
-        part_volume = float(partVolume.value)
+        part_volume = float(model_parts[index].volume)
         part_material = partMaterial.value
         material_type = get_material_type(part_material)
         material_cost = float(materialCost.value)
