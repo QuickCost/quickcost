@@ -104,7 +104,7 @@ def update_material_prices():
         # Interaction with the API
         ## TODO: set material prices from API
         if m == Material.Aluminium:
-            material_prices[m] = 1
+            material_prices[m] = 0.070675625
         elif m == Material.Brass:
             material_prices[m] = 1
         elif m == Material.Carbon_Steel:
@@ -112,23 +112,23 @@ def update_material_prices():
         elif m == Material.Cast_Iron:
             material_prices[m] = 1
         elif m == Material.Cobalt:
-            material_prices[m] = 1
+            material_prices[m] = 16.25
         elif m == Material.Copper:
-            material_prices[m] = 1
+            material_prices[m] = 0.2428125
         if m == Material.Gold:
-            material_prices[m] = 1
+            material_prices[m] = 1958.2
         elif m == Material.Magnesium:
             material_prices[m] = 1
         elif m == Material.Nickel:
-            material_prices[m] = 1
+            material_prices[m] = 21088.5
         elif m == Material.Silver:
-            material_prices[m] = 1
+            material_prices[m] = 23.81905202
         elif m == Material.Stainless:
             material_prices[m] = 1
         elif m == Material.Steel:
             material_prices[m] = 1
         elif m == Material.Tin:
-            material_prices[m] = 1
+            material_prices[m] = 25643.875
         elif m == Material.Titanium:
             material_prices[m] = 1
         elif m == Material.Zamak:
