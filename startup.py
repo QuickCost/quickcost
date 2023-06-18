@@ -104,7 +104,7 @@ def update_material_prices():
         # Interaction with the API
         ## TODO: set material prices from API
         if m == Material.Aluminium:
-            material_prices[m] = 1
+            material_prices[m] = 0.070675625
         elif m == Material.Brass:
             material_prices[m] = 1
         elif m == Material.Carbon_Steel:
@@ -112,25 +112,25 @@ def update_material_prices():
         elif m == Material.Cast_Iron:
             material_prices[m] = 1
         elif m == Material.Cobalt:
-            material_prices[m] = 1
+            material_prices[m] = 16.25
         elif m == Material.Copper:
-            material_prices[m] = 1
+            material_prices[m] = 0.2428125
         if m == Material.Gold:
-            material_prices[m] = 1
+            material_prices[m] = 1958.2
         elif m == Material.Magnesium:
             material_prices[m] = 1
         elif m == Material.Nickel:
-            material_prices[m] = 1
+            material_prices[m] = 21088.5
         elif m == Material.Silver:
-            material_prices[m] = 1
+            material_prices[m] = 23.81905202
         elif m == Material.Stainless:
             material_prices[m] = 1
         elif m == Material.Steel:
             material_prices[m] = 1
         elif m == Material.Tin:
-            material_prices[m] = 1
+            material_prices[m] = 25643.875
         elif m == Material.Titanium:
-            material_prices[m] = 1
+            material_prices[m] = 6.75
         elif m == Material.Zamak:
             material_prices[m] = 1
 
@@ -192,27 +192,34 @@ def get_name_parts():
 def total_cost_part(p: Part) -> float:
     # Calculate the cost of the part
     comp = p.get_component()
-    if comp == Component.CastPart or comp == Component.Chiller or comp == Component.Riser or comp == Component.Overflow:
+    if comp == Component.CastPart or comp == Component.Chiller or comp == Component.Overflow:
         return float(p.get_volume() * material_prices[p.get_material()])
 
     elif comp == Component.Core or comp == Component.Sleeve or comp == Component.Filter:
         return float(p.get_volume() * material_prices[p.get_material()] + p.get_production_cost())
-
+    elif comp == Component.Riser:
+        return 0
     else:
         return -1
 
 
 def get_component():
-    if partName.value[:5] == "riser": return "Riser"
+    if partName.value[:4] == "core": return "Core"
+    elif partName.value[:7] == "chiller": return "Chiller"
+    elif partName.value[:5] == "riser": return "Riser"
     elif partName.value[:6] == "sleeve": return "Sleeve"
+    elif partName.value[:8] == "overflow": return "Overflow"
+    elif partName.value[:6] == "filter": return "Filter"
     elif partName.value[:4] == "Part": return "CastPart"
     else: return "-1"
+
 
 
 def estimated_cost_part(p: Part) -> float:
     # Calculate the estimated cost of the part
     return float(p.get_volume() * material_prices[p.get_material()] * 2)
 
+# TODO: fer-ho be
 def total_cost_model() -> float:
     # Calculate the total cost of the model
     total_cost = 0
@@ -265,6 +272,7 @@ partNameLabel = gui.Label(
 def onSelected(event):
     partComponent.text = get_component()
     partVolume.text = get_volume()
+    partMaterial.value = get_material()
 
 partName = gui.ComboBox(
     parent = None,
@@ -299,7 +307,6 @@ def get_volume():
     return round(volume,4)
 
 
-## TODO: set text with the volume of the part
 partVolume = gui.LineEdit(
     parent = None,
     name = 'partVolume',
@@ -313,11 +320,23 @@ partMaterialLabel = gui.Label(
     text = 'Material',
 )
 
+def get_material():
+    material = "Material not found"
+    for part in model_parts:
+        if part.name == partName.value:
+            material = part.GetAttribute("c2_materialGroup")
+    if material == "Cast-Iron": material = "Cast_Iron"
+    elif material == "Carbon-Steel": material = "Carbon-Steel"
+    if partName.value == "Sleeve": material = "Steel"
+    return material
+
 ## TODO: set selected value with the material of the part
+##       i mirar que tots els materials estan be
 partMaterial = gui.ComboBox(
     parent = None,
     name = 'partMaterial',
-    values = ('Aluminium', 'Brass', 'Carbon_Steel', 'Cast_Iron', 'Cobalt', 'Copper', 'Gold', 'Magnesium', 'Nickel', 'Silver', 'Stainless', 'Steel', 'Tin', 'Titanium', 'Zamak', )
+    values = ('Aluminium', 'Brass', 'Carbon_Steel', 'Cast_Iron', 'Cobalt', 'Copper', 'Gold', 'Magnesium', 'Nickel', 'Silver', 'Stainless', 'Steel', 'Tin', 'Titanium', 'Zamak', ),
+    value = get_material(),
 )
 
 materialCostLabel = gui.Label(
