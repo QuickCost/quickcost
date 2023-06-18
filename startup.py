@@ -10,6 +10,7 @@ number_parts = len(model_parts)
 parts_vector = []
 parts_map = {}
 material_prices = {}
+selectedCurrency = "EUR (€)"
 
 
 # Classes
@@ -43,14 +44,16 @@ class Material(Enum):
     Tin = 13
     Titanium = 14
     Zamak = 15
+    NA = 16
 
 class Part:
-    def __init__(self, name: str, component: Component, volume: float, material: Material, production_cost: float, reusable: bool):
+    def __init__(self, name: str, component: Component, volume: float, material: Material, production_cost: float, part_cost: float, reusable: bool):
         self.name = name
         self.component = component
         self.volume = volume
         self.material = material
         self.production_cost = production_cost
+        self.part_cost = part_cost
         self.reusable = reusable
 
     def get_name(self):
@@ -104,35 +107,37 @@ def update_material_prices():
         # Interaction with the API
         ## TODO: set material prices from API
         if m == Material.Aluminium:
-            material_prices[m] = 0.070675625
+            material_prices[m] = 2.493009304
         elif m == Material.Brass:
-            material_prices[m] = 1
+            material_prices[m] = 4.112723501
         elif m == Material.Carbon_Steel:
-            material_prices[m] = 1
+            material_prices[m] = 2.275
         elif m == Material.Cast_Iron:
-            material_prices[m] = 1
+            material_prices[m] = 0.1745926
         elif m == Material.Cobalt:
-            material_prices[m] = 16.25
+            material_prices[m] = 26.86775
         elif m == Material.Copper:
-            material_prices[m] = 0.2428125
+            material_prices[m] = 7.7849135
         if m == Material.Gold:
-            material_prices[m] = 1958.2
+            material_prices[m] = 274604.7422
         elif m == Material.Magnesium:
-            material_prices[m] = 1
+            material_prices[m] = 2.752880922
         elif m == Material.Nickel:
-            material_prices[m] = 21088.5
+            material_prices[m] = 21.056035
         elif m == Material.Silver:
-            material_prices[m] = 23.81905202
+            material_prices[m] = 775.8402098
         elif m == Material.Stainless:
-            material_prices[m] = 1
+            material_prices[m] = 4.0768
         elif m == Material.Steel:
-            material_prices[m] = 1
+            material_prices[m] = 1.6920995
         elif m == Material.Tin:
-            material_prices[m] = 25643.875
+            material_prices[m] = 25.75391
         elif m == Material.Titanium:
-            material_prices[m] = 6.75
+            material_prices[m] = 6.1425
         elif m == Material.Zamak:
-            material_prices[m] = 1
+            material_prices[m] = 3.21996157
+        elif m == Material.NA:
+            material_prices[m] = 0
 
 def get_component_type(part_component: str) -> Component:
     if part_component == "Core":
@@ -181,6 +186,8 @@ def get_material_type(part_material: str) -> Material:
         return Material.Titanium
     elif part_material == "Zamak":
         return Material.Zamak
+    elif part_material == "NA":
+        return Material.NA
 
 def get_name_parts():
     name_parts = ()
@@ -192,16 +199,19 @@ def get_name_parts():
 def total_cost_part(p: Part) -> float:
     # Calculate the cost of the part
     comp = p.get_component()
+    price = 0
     if comp == Component.CastPart or comp == Component.Chiller or comp == Component.Overflow:
-        return float(p.get_volume() * material_prices[p.get_material()])
+        price = round(float(p.volume * material_prices[p.material]), 4)
 
     elif comp == Component.Core or comp == Component.Sleeve or comp == Component.Filter:
-        return float(p.get_volume() * material_prices[p.get_material()] + p.get_production_cost())
+        price = round(float(p.volume * material_prices[p.material] + p.production_cost), 4)
     elif comp == Component.Riser:
         return 0
     else:
         return -1
-
+    if selectedCurrency == "EUR (€)": return price
+    elif selectedCurrency == "USD ($)": return price*1.10
+    elif selectedCurrency == "GBP (£)": return price*0.86
 
 def get_component():
     if partName.value[:4] == "core": return "Core"
@@ -213,21 +223,30 @@ def get_component():
     elif partName.value[:4] == "Part": return "CastPart"
     else: return "-1"
 
+def get_component_aux(name):
+    if name[:4] == "core": return "Core"
+    elif name[:7] == "chiller": return "Chiller"
+    elif name[:5] == "riser": return "Riser"
+    elif name[:6] == "sleeve": return "Sleeve"
+    elif name[:8] == "overflow": return "Overflow"
+    elif name[:6] == "filter": return "Filter"
+    elif name[:4] == "Part": return "CastPart"
+    else: return "-1"
+
 
 
 def estimated_cost_part(p: Part) -> float:
     # Calculate the estimated cost of the part
     return float(p.get_volume() * material_prices[p.get_material()] * 2)
 
-# TODO: fer-ho be
+
 def total_cost_model() -> float:
     # Calculate the total cost of the model
     total_cost = 0
+    for i in range(number_parts):
+        total_cost += parts_vector[i].part_cost
 
-    for part in parts_vector:
-        total_cost += total_cost_part(part)
-
-    return total_cost
+    return round(total_cost, 4)
 
 # def update_prices(moneda):
 #     url = f"https://commodities-api.com/api/latest?access_key=ad3lcz6of4m5b37ka20q0k5tulwdi0hanmc05wxb17mi28ygjf02ea2vpl3k&base={moneda}&symbols=ALU,LCO,XCU,XAU,NI,XAG,TIN"
@@ -273,6 +292,7 @@ def onSelected(event):
     partComponent.text = get_component()
     partVolume.text = get_volume()
     partMaterial.value = get_material()
+    materialCost.text = get_material_cost()
 
 partName = gui.ComboBox(
     parent = None,
@@ -296,7 +316,7 @@ partComponent = gui.Label(
 partVolumeLabel = gui.Label(
     parent = None,
     name = 'partVolumeLabel',
-    text = 'Volume',
+    text = 'Mass',
 )
 
 def get_volume():
@@ -321,36 +341,54 @@ partMaterialLabel = gui.Label(
 )
 
 def get_material():
-    material = "Material not found"
+    material = "Aluminium"
     for part in model_parts:
         if part.name == partName.value:
             material = part.GetAttribute("c2_materialGroup")
     if material == "Cast-Iron": material = "Cast_Iron"
     elif material == "Carbon-Steel": material = "Carbon-Steel"
-    if partName.value == "Sleeve": material = "Steel"
+    if partName.value[:6] == "sleeve": material = "Steel"
+    elif partName.value[:5] == "riser": material = "NA"
     return material
 
-## TODO: set selected value with the material of the part
-##       i mirar que tots els materials estan be
+def get_material_aux(name):
+    material = "Aluminium"
+    for part in model_parts:
+        if part.name == name:
+            material = part.GetAttribute("c2_materialGroup")
+    if material == "Cast-Iron": material = "Cast_Iron"
+    elif material == "Carbon-Steel": material = "Carbon-Steel"
+    if name[:6] == "sleeve": material = "Steel"
+    elif name[:5] == "riser": material = "NA"
+    return material
+
 partMaterial = gui.ComboBox(
     parent = None,
     name = 'partMaterial',
-    values = ('Aluminium', 'Brass', 'Carbon_Steel', 'Cast_Iron', 'Cobalt', 'Copper', 'Gold', 'Magnesium', 'Nickel', 'Silver', 'Stainless', 'Steel', 'Tin', 'Titanium', 'Zamak', ),
+    values = ('Aluminium', 'Brass', 'Carbon_Steel', 'Cast_Iron', 'Cobalt', 'Copper', 'Gold', 'Magnesium', 'Nickel', 'Silver', 'Stainless', 'Steel', 'Tin', 'Titanium', 'Zamak', 'NA', ),
     value = get_material(),
 )
 
 materialCostLabel = gui.Label(
     parent = None,
     name = 'materialCostLabel',
-    text = 'Material cost (€/mt)',
+    text = 'Material cost (€/kg)',
 )
 
-## TODO: set text with the cost of the material selected
+def get_material_cost():
+    update_material_prices()
+    mat = get_material()
+    mat1 = get_material_type(mat)
+    return material_prices[mat1]
+
+
+
 materialCost = gui.LineEdit(
     parent = None,
-    name = 'materialCost',
-    text = '0',
+    name = 'material_Cost',
+    text = get_material_cost(),
 )
+
 
 productionCostLabel = gui.Label(
     parent = None,
@@ -376,16 +414,6 @@ isReusable = gui.CheckBox(
     text = '',
 )
 
-def onClickResetValuesButton(event):
-  ## TODO: set default values on GUI
-  gui.tellUser("Hello World")
-  
-resetValuesButton = gui.PushButton(
-    parent = None,
-    name = 'resetValuesButton',
-    text = 'Reset values',
-    command = onClickResetValuesButton,
-)
 
 horizontalSpacer_4 = gui.SpacerItem(40, 20, spacing = 'Horizontal')
 
@@ -396,7 +424,6 @@ partCostLabel = gui.Label(
     font = dict(size = 9, bold = True),
 )
 
-## TODO: add to text the selected currency symbol
 partCost = gui.Label(
     parent = None,
     name = 'partCost',
@@ -445,10 +472,16 @@ currencyLabel = gui.Label(
     text = 'Select currency',
 )
 
+def onChangeCurrency(event):
+    global selectedCurrency
+    selectedCurrency = currency.value
+
 currency = gui.ComboBox(
     parent = None,
     name = 'currency',
-    values = ('EUR (€)', 'USD ($)', 'GBP (£)', )
+    values = ('EUR (€)', 'USD ($)', 'GBP (£)', ),
+    value = selectedCurrency,
+    command = onChangeCurrency,
 )
 
 totalCostLabel = gui.Label(
@@ -458,7 +491,6 @@ totalCostLabel = gui.Label(
     font = dict(size = 10, bold = True),
 )
 
-## TODO: add to text the selected currency symbol
 totalCost = gui.Label(
     parent = None,
     name = 'totalCost',
@@ -470,20 +502,21 @@ totalCost.SetAlignment(gui.hwui.ui.AlignLeading|gui.hwui.ui.AlignLeft|gui.hwui.u
 def init_data():
     clean_data()
     update_material_prices()
-    number_parts = 1
     
     for index in range(number_parts):
-        part_name = partName.value
-        part_component = partComponent.value
+        part_name = model_parts[index].name
+        part_component = get_component_aux(part_name)
         component_type = get_component_type(part_component)
-        part_volume = float(model_parts[index].volume)
-        part_material = partMaterial.value
+        part_volume = float(model_parts[index].mass)
+        part_material = get_material_aux(part_name)
         material_type = get_material_type(part_material)
-        material_cost = float(materialCost.value)
+        material_cost = 0
         part_production_cost = float(productionCost.value)
         part_reusable = isReusable.value
-    
-        part = Part(part_name, component_type, part_volume, material_type, part_production_cost, part_reusable)
+
+        part_aux = Part(part_name, component_type, part_volume, material_type, part_production_cost, 0, part_reusable)
+        part_cost = total_cost_part(part_aux)
+        part =  Part(part_name, component_type, part_volume, material_type, part_production_cost, part_cost, part_reusable)
         parts_vector.append(part)
         parts_map[part_name] = (part)
 
@@ -491,9 +524,9 @@ def calculate_costs():
     init_data()
     part = parts_map[partName.value]
     totalPartCost = str(total_cost_part(part))
-    partCost.text = totalPartCost
+    partCost.text = str(totalPartCost + " " + selectedCurrency)
     totalCostModel = str(total_cost_model())
-    totalCost.text = totalCostModel
+    totalCost.text = str(totalCostModel + " " + selectedCurrency)
 
 def onClickCalculateCostsButton(event):
     calculate_costs()
@@ -505,16 +538,20 @@ calculateCostsButton = gui.PushButton(
     command = onClickCalculateCostsButton,
 )
 
-def onClickGenerateCostReportButton(event):
-  ## TODO: generate cost report and download it
-  gui.tellUser("Hello World")
+def onClickResetValuesButton(event):
+    init_data()
+    partComponent.text = get_component()
+    partVolume.text = get_volume()
+    partMaterial.value = get_material()
+    materialCost.text = get_material_cost()
 
-generateCostReportButton = gui.PushButton(
+resetValuesButton = gui.PushButton(
     parent = None,
-    name = 'generateCostReportButton',
-    text = 'Generate cost report',
-    command = onClickGenerateCostReportButton,
+    name = 'resetValuesButton',
+    text = 'Reset values',
+    command = onClickResetValuesButton,
 )
+
 
 horizontalSpacer_3 = gui.SpacerItem(40, 20, spacing = 'Horizontal')
 
@@ -580,8 +617,8 @@ isReusableHorizontalLayout = gui.HBoxLayout(
 resetAndPartCostHorizontalLayout = gui.HBoxLayout(
     spacing = 6,
     children = (
-        resetValuesButton,
-        '<->',
+        # resetValuesButton,
+        # '<->',
         partCostLabel,
         partCost,
     )
@@ -638,7 +675,7 @@ costsButtonsHorizontalLayout = gui.HBoxLayout(
     spacing = 6,
     children = (
         calculateCostsButton,
-        generateCostReportButton,
+        resetValuesButton,
     )
 )
 
@@ -686,7 +723,7 @@ QuickCost = gui.Dialog(caption = 'QuickCost'
 
 class ExtensionContext(inspire.gui.Context):
     def onFirstActivate(self):
-        # TODO: Replace this dialog by your dialog
+
         self.dialog = QuickCost
         self.dialog.OnHide().Connect(self._onDialogHide)
 
