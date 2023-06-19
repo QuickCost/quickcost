@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Extension">
-<entry name="name" value="Casting"/>
+<entry name="name" value="Quick Cost"/>
 <entry name="script" value ="startup.py"/>
-<entry name="author" value="......"/>
+<entry name="author" value="QuickCost"/>
 <entry name="publisher" value="......"/>
-<entry name="description" value="Inspire Cast Extension ..."/>
+<entry name="description" value="Extension to calculate the cost of your models in Altair applications."/>
 <entry name="documentation" value="readme.html"/>
 <entry name="minProductVersion"   value="2022.2 "/>
 </section>
