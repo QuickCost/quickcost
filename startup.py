@@ -757,9 +757,10 @@ def startup():
         ribbon,
         children=[
             gui.SpriteActionGroup(
+		text="Quick Cost",
                 children=[
                     gui.SpriteAction(
-                        name="Casting.Extension",
+                        name="Calculate Costs",
                         icon="ribbonSleeveStrip-64.png",
                         context=ExtensionContext,
                     )
@@ -767,6 +768,5 @@ def startup():
             )
         ],
     )
-
 
 startup()
